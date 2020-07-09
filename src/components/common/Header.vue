@@ -8,13 +8,26 @@
                 <ul class="nav full-left">
                     <li v-for="i in Header_list"><span>{{i.title}}</span></li>
                 </ul>
-                <div class="login-bar full-right">
+                <!--          用户存在      -->
+                <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
                         <img src="/static/image/" alt="">
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
-                        <span>登录</span>
+                        <router-link to="/home/login/">个人中心</router-link>
+                        &nbsp;|&nbsp;
+                        <span><a href="javascript:;" @click="quit">退出登录</a></span>
+                    </div>
+                </div>
+                <!--          用户不存在      -->
+                <div class="login-bar full-right" v-else>
+                    <div class="shop-cart full-left">
+                        <img src="/static/image/" alt="">
+                        <span><router-link to="/cart">购物车</router-link></span>
+                    </div>
+                    <div class="login-box full-left">
+                        <router-link to="/home/login/">登录</router-link>
                         &nbsp;|&nbsp;
                         <span>注册</span>
                     </div>
@@ -31,9 +44,22 @@
         data() {
             return {
                 Header_list: [],
+                token:'',
             }
         },
         methods: {
+            //退出登录
+            quit(){
+                //清空localstorage
+                localStorage.clear();
+                this.$router.push('/home/login');
+            },
+            // 获取token  确定用户登录状态
+            get_token() {
+                this.token = localStorage.user_token || sessionStorage.user_token;
+                // return this.token;
+            },
+
             get_head() {
                 this.$axios({
                     url: this.$settings.HOST + 'home/header/',
@@ -51,6 +77,7 @@
         created() {
             // 获取顶部数据
             this.get_head();
+            this.get_token();
         }
     }
 </script>

@@ -18,6 +18,9 @@ Vue.use(Element);
 
 Vue.prototype.$settings = settings;
 
+// 导入极验
+import "../static/js/gt.js"
+
 // 全局css
 import "../static/css/global.css"
 import settings from "./settings";
