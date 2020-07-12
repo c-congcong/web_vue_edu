@@ -6,7 +6,7 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left">
-                    <li v-for="i in Header_list"><span>{{i.title}}</span></li>
+                    <li v-for="i in Header_list"><span v-if="i.position === 1">{{i.title}}</span></li>
                 </ul>
                 <!--          用户存在      -->
                 <div class="login-bar full-right" v-if="token">
@@ -29,7 +29,7 @@
                     <div class="login-box full-left">
                         <router-link to="/home/login/">登录</router-link>
                         &nbsp;|&nbsp;
-                        <span>注册</span>
+                        <router-link to="/home/register">注册</router-link>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,9 @@
             quit(){
                 //清空localstorage
                 localStorage.clear();
-                this.$router.push('/home/login');
+                sessionStorage.clear();
+                location.reload();
+                // this.$router.push('/home/login');
             },
             // 获取token  确定用户登录状态
             get_token() {

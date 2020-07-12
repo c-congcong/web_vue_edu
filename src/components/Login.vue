@@ -9,7 +9,7 @@
             <div class="login_box">
                 <div class="title">
                     <span>密码登录</span>
-                    <span>短信登录</span>
+                    <router-link to="/home/sms">短信登录</router-link>
                 </div>
                 <div class="inp" v-if="">
                     <input type="text" placeholder="用户名 / 手机号码" class="user" v-model="username">
@@ -24,7 +24,7 @@
                     </div>
                     <button class="login_btn btn btn-primary" @click="get_captcha">登录</button>
                     <p class="go_login">没有账号
-                        <span>立即注册</span>
+                        <router-link to="/home/register">立即注册</router-link>
                     </p>
                 </div>
                 <div class="inp" v-show="">
@@ -33,7 +33,7 @@
                     <button id="get_code" class="btn btn-primary">获取验证码</button>
                     <button class="login_btn">登录</button>
                     <span class="go_login">没有账号
-                    <span>立即注册</span>
+                    <router-link to="/home/register">立即注册</router-link>
                 </span>
                 </div>
             </div>

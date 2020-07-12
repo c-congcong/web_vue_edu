@@ -2,7 +2,7 @@
     <div class="footer">
         <ul>
             <li v-for="i in Footer_list">
-                {{i.title}}
+                <span v-if="i.position === 2">{{i.title}}</span>
             </li>
         </ul>
     </div>
@@ -20,7 +20,7 @@
         methods: {
             get_foot() {
                 this.$axios({
-                    url: this.$settings.HOST + 'home/footer/',
+                    url: this.$settings.HOST + 'home/header/',
                     method: "get",
                 }).then(res => {
                     // 当前请求的返回值可以通过res接受到
