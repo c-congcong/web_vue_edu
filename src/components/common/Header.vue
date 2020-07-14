@@ -6,7 +6,7 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left">
-                    <li v-for="i in Header_list"><span v-if="i.position === 1">{{i.title}}</span></li>
+                    <li v-for="i in Header_list"><span v-if="i.position === 1"><router-link to="/python">{{i.title}}</router-link></span></li>
                 </ul>
                 <!--          用户存在      -->
                 <div class="login-bar full-right" v-if="token">
@@ -15,7 +15,7 @@
                         <span><router-link to="/cart">购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
-                        <router-link to="/home/login/">个人中心</router-link>
+                        <router-link to="/home/login/" v-model="name">欢迎{{name}}</router-link>
                         &nbsp;|&nbsp;
                         <span><a href="javascript:;" @click="quit">退出登录</a></span>
                     </div>
@@ -45,6 +45,7 @@
             return {
                 Header_list: [],
                 token:'',
+                name:'',
             }
         },
         methods: {
@@ -68,7 +69,7 @@
                     method: "get",
                 }).then(res => {
                     // 当前请求的返回值可以通过res接受到
-                    console.log(res.data);
+                    // console.log(res.data);
                     this.Header_list = res.data;
                 }).catch(error => {
                     console.log(error);
@@ -80,6 +81,10 @@
             // 获取顶部数据
             this.get_head();
             this.get_token();
+            let username = localStorage.getItem("username");
+            if (username) {
+                this.name = username
+            }
         }
     }
 </script>

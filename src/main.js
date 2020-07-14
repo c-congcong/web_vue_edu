@@ -18,6 +18,13 @@ Vue.use(Element);
 
 Vue.prototype.$settings = settings;
 
+// vue-video-player
+require('video.js/dist/video-js.css');
+require('vue-video-player/src/custom-theme.css');
+import VideoPlayer from 'vue-video-player'
+
+Vue.use(VideoPlayer);
+
 // 导入极验
 import "../static/js/gt.js"
 
