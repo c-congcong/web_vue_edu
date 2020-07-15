@@ -34,7 +34,8 @@
                             <button class="buy-now">立即购买</button>
                             <button class="free">免费试学</button>
                         </div>
-                        <div class="add-cart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车</div>
+                        <div class="add-cart" @click="add_cart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,21 +78,14 @@
                             <div slot="header" class="clearfix">
                                 <h2>评论区</h2><br>
                                 <el-input style="width: 650px" v-model="msg" placeholder="请输入内容"></el-input>
-                                <el-button style="float: right; padding: 10px 0" size="medium" @click="add" type="text">操作按钮</el-button>
+                                <el-button style="float: right; padding: 10px 0" size="medium" @click="add" type="text">
+                                    操作按钮
+                                </el-button>
                             </div>
                             <div v-for="m in msgs" class="text item" style="color: #9b9b9b">
                                 {{m}}
                             </div>
                         </el-card>
-                        <!--                        <div>-->
-                        <!--                            <h2>评论区</h2>-->
-                        <!--                            <el-input v-model="msg" placeholder="请输入内容"></el-input>-->
-                        <!--                            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>-->
-                        <!--                            <hr>-->
-                        <!--                            <ul>-->
-                        <!--                                <li v-for="m in msgs">{{m}}</li>-->
-                        <!--                            </ul>-->
-                        <!--                        </div>-->
                     </div>
                     <div class="tab-item" v-if="tabIndex==4">
                         常见问题
@@ -158,6 +152,43 @@
             }
         },
         methods: {
+            //墙灯
+            user_login() {
+                let token = localStorage.user_token || sessionStorage.user_token;
+                if (!token) {
+                    let self = this;
+                    this.$confirm("对不起请先登录！", {
+                        callback() {
+                            self.$router.push("/home/login");
+                        }
+                    });
+                    return false
+                }
+                return token;
+            },
+
+            //加入购物车
+            add_cart() {
+                let token = this.user_login();
+                this.$axios.post(`${this.$settings.HOST}cart/option/`, {
+                    course_id: this.course_id,
+                }, {
+                    headers: {
+                        "Authorization": "jwt " + token,
+                    }
+                }).then(response => {
+                    this.$message.success(response.data.message);
+                           //向状态机提交动作
+                    this.$store.commit("add_cart",response.data.cart_length)
+                }).catch(error => {
+                    console.log(error.response);
+                })
+
+            },
+
+            //展示购物车
+            
+
             // 获取所有课程的信息
             get_course_list() {
                 let id = this.$route.params.id;
@@ -208,17 +239,19 @@
         created() {
             this.get_course_list();
             this.get_chapter_list();
+            //留言板
             if (localStorage.msgs) {
-                this.msgs = JSON.parse(localStorage.msgs)
+                this.msgs = JSON.parse(localStorage.msgs);
+                this.name = localStorage.getItem("username") || sessionStorage.getItem("username");
             }
             //强登
-            let username = localStorage.getItem("username");
-            if (username) {
-                this.name = username
-            } else {
-                this.$message.error('请先登录');
-                this.$router.push("/home/login")
-            }
+            // let username =
+            // if (username) {
+            //
+            // } else {
+            //     this.$message.error('请先登录');
+            //     this.$router.push("/home/login")
+            // }
         },
     }
 </script>

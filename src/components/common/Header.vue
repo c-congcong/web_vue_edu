@@ -12,7 +12,7 @@
                 <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
                         <img src="/static/image/" alt="">
-                        <span><router-link to="/cart">购物车</router-link></span>
+                        <span><router-link to="/cart">{{this.$store.state.cart_length}}购物车</router-link></span>
                     </div>
                     <div class="login-box full-left">
                         <router-link to="/home/login/" v-model="name">欢迎{{name}}</router-link>
@@ -81,7 +81,7 @@
             // 获取顶部数据
             this.get_head();
             this.get_token();
-            let username = localStorage.getItem("username");
+            let username = localStorage.user_name || sessionStorage.user_name;
             if (username) {
                 this.name = username
             }
