@@ -51,8 +51,8 @@
 
                         </ul>
                         <div class="pay-box">
-                            <span class="discount-type">限时免费</span>
-                            <span class="discount-price">￥0.00元</span>
+                            <span class="discount-type" v-if="course.discount_name">{{course.discount_name}}</span>
+                            <span class="discount-price">￥{{course.real_price}}元</span>
                             <span class="original-price">原价：{{course.price}}元</span>
                             <span class="buy-now">立即购买</span>
                         </div>
@@ -76,8 +76,14 @@
 </template>
 
 <script>
+    import Header from "./common/Header";
+    import Footer from "./common/Footer";
+
     export default {
         name: "Course",
+        components: {
+            Header, Footer
+        },
         data() {
             return {
                 category_list: [],  // 分类列表

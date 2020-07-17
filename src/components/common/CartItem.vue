@@ -8,14 +8,13 @@
             <span><router-link :to="'course/detail/'+course.id">{{course.name}}</router-link></span>
         </div>
         <div class="cart_column column_3">
-            <el-select v-model="expire" size="mini" placeholder="请选择购买有效期" class="my_el_select">
-                <el-option label="1个月有效" value="30" key="30"></el-option>
-                <el-option label="2个月有效" value="60" key="60"></el-option>
-                <el-option label="3个月有效" value="90" key="90"></el-option>
-                <el-option label="永久有效" value="10000" key="10000"></el-option>
+            <el-select v-model="course.expire_id" size="mini" placeholder="请选择购买有效期" class="my_el_select">
+                <el-option
+                    :label="item.expire_text" :value="item.id" :key="item.id" v-for="item in course.expire_list">
+                </el-option>
             </el-select>
         </div>
-        <div class="cart_column column_4">{{course.price}}</div>
+        <div class="cart_column column_4">{{course.real_price}}</div>
         <div class="cart_column column_4" @click="del">删除</div>
     </div>
 </template>
@@ -27,27 +26,53 @@
         props: ["course"],
         watch: {
             'course.selected': function () {
+                console.log(this.course);
                 //切换状态
                 this.change_select()
+            },
+            // 切换课程有效期
+            'course.expire_id': function () {
+                // 后台发送请求切换状态
+                this.change_expire()
             }
         },
         methods: {
             //删除当前商品
             del() {
                 let token = localStorage.user_token || sessionStorage.user_token;
-                this.$axios({
-                    url: this.$settings.HOST + `cart/option/`,
-                    method: "delete",
-                    data: {
-                        course_id: this.course.id,
-                    },
-                    config: {
-                        headers: {
-                            //提交token必须在请求头声明token ，jwt必须有空格
-                            "Authorization": "jwt " + token,
-                        }
-                    }
+                // this.$axios({
+                //     url: this.$settings.HOST + `cart/option/`,
+                //     method: "delete",
+                //     data: {
+                //         course_id: this.course.id,
+                //     },
+                //     config: {
+                //         headers: {
+                //             //提交token必须在请求头声明token ，jwt必须有空格
+                //             "Authorization": "jwt " + token,
+                //         }
+                //     }
+                //
+                // }).then(response => {
+                //     this.$message.success(response.data.message);
+                //     let i = 10;
+                //     setInterval(() => {
+                //         if (i <= 1) {
+                //             //刷新界面
+                //             location.reload();
+                //         } else {
+                //             i--;
+                //         }
+                //     }, 100);
+                // }).catch(error => {
+                //     console.log(error.response);
+                // });
 
+
+                this.$axios.delete(`${this.$settings.HOST}cart/option/${this.course.id}`, {
+                    headers: {
+                        "Authorization": "jwt " + token,
+                    }
                 }).then(response => {
                     this.$message.success(response.data.message);
                     let i = 10;
@@ -62,18 +87,6 @@
                 }).catch(error => {
                     console.log(error.response);
                 });
-
-
-                // this.$axios.delete(`${this.$settings.HOST}cart/option/`, {
-                //     headers: {
-                //         "Authorization": "jwt " + token,
-                //         course_id: this.course.id,
-                //     }
-                // }).then(response => {
-                //     this.$message.success(response.data.message)
-                // }).catch(error => {
-                //     console.log(error.response);
-                // })
 
             },
 
@@ -91,7 +104,28 @@
                 }).catch(error => {
                     console.log(error.response);
                 })
-            }
+            },
+            // 改变redis中的课程有效期
+            change_expire() {
+                let token = sessionStorage.user_token || localStorage.user_token;
+                this.$axios.put(`${this.$settings.HOST}cart/option/`, {
+                    expire_id: this.course.expire_id,
+                    course_id: this.course.id
+                }, {
+                    headers: {
+                        "Authorization": "jwt " + token,
+                    }
+                }).then(response => {
+                    console.log(response.data);
+
+                    // 更新切换有效期后课程的价格
+                    this.course.real_price = response.data.real_price;
+
+                    this.$message.success("切换有效期成功");
+                }).catch(error => {
+                    console.log(error);
+                })
+            },
         },
         data() {
             return {

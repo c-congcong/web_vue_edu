@@ -17,17 +17,20 @@
                 </div>
                 <div class="wrap-right">
                     <h3 class="course-name">{{course_list.name}}</h3>
-                    <p class="data">{{course_list.students}}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：{{course_list.pub_lessons}}课时/{{course_list.lessons}}小时&nbsp;&nbsp;&nbsp;&nbsp;难度：{{course_list.level_name}}}</p>
-                    <div class="sale-time">
-                        <p class="sale-type" v-if="course_list.course_type===0">付费课程</p>
-                        <p class="sale-type" v-else-if="course_list.course_type===1">高级课程</p>
-                        <p class="sale-type" v-else="">专业技能</p>
-                        <p class="expire">距离结束：仅剩 110天 13小时 33分 <span class="second">08</span> 秒</p>
+                    <p class="data">{{course_list.students}}人在学&nbsp;&nbsp;&nbsp;&nbsp;课程总时长：{{course_list.lessons}}课时/{{course_list.lessons==course_list.pub_lessons?'更新完成':`已更新${course_list.pub_lessons}课时`}}&nbsp;&nbsp;&nbsp;&nbsp;难度：{{course_list.level_name}}</p>
+                    <div class="sale-time" v-if="course_list.discount_name">
+                        <p class="sale-type">{{course_list.discount_name}}</p>
+                        <p class="expire">距离结束：仅剩 {{parseInt(course_list.active_time/(24*3600))}}天
+                            {{parseInt(course_list.active_time/3600%24)}}小时
+                            {{parseInt(course_list.active_time/60%60)}}分
+                            <span class="second">{{parseInt(course_list.active_time%60)}}</span> 秒</p>
                     </div>
                     <p class="course-price">
-                        <span>活动价</span>
-                        <span class="discount">¥0.00</span>
-                        <span class="original">{{course_list.price}}</span>
+                        <span v-if="course_list.discount_name">活动价</span>
+                        <span v-else>价格</span>
+                        <span class="discount" v-if="course_list.discount_name">¥{{course_list.real_price}}</span>
+                        <span class="original" v-if="course_list.discount_name">¥{{course_list.price}}</span>
+                        <span class="discount" v-else>¥{{course_list.price}}</span>
                     </p>
                     <div class="buy">
                         <div class="buy-btn">
@@ -178,8 +181,8 @@
                     }
                 }).then(response => {
                     this.$message.success(response.data.message);
-                           //向状态机提交动作
-                    this.$store.commit("add_cart",response.data.cart_length)
+                    //向状态机提交动作
+                    this.$store.commit("add_cart", response.data.cart_length)
                 }).catch(error => {
                     console.log(error.response);
                 })
@@ -187,7 +190,7 @@
             },
 
             //展示购物车
-            
+
 
             // 获取所有课程的信息
             get_course_list() {
@@ -231,7 +234,13 @@
                     localStorage.msgs = JSON.stringify(this.msgs);
                     this.msg = '';
                 }
-            }
+            },
+            //倒计时
+            time_sub() {
+                setInterval(() => {
+                    this.course_list.active_time--;
+                }, 1000);
+            },
         },
         components: {
             Header, Footer, videoPlayer
@@ -239,6 +248,7 @@
         created() {
             this.get_course_list();
             this.get_chapter_list();
+            this.time_sub();
             //留言板
             if (localStorage.msgs) {
                 this.msgs = JSON.parse(localStorage.msgs);
@@ -322,17 +332,18 @@
     .sale-time {
         width: 464px;
         background: #84cc39;
-        font-size: 14px;
+        font-size: 20px;
         color: #4a4a4a;
         padding: 10px 23px;
         overflow: hidden;
     }
 
     .sale-type {
-        font-size: 16px;
+        font-size: 20px;
         color: #fff;
         letter-spacing: .36px;
         float: left;
+        padding-top: 5px;
     }
 
     .sale-time .expire {
@@ -342,12 +353,15 @@
     }
 
     .sale-time .expire .second {
-        width: 24px;
+        width: 30px;
         display: inline-block;
-        background: #fafafa;
-        color: #5e5e5e;
+        background: greenyellow;
+        color: red;
+        font-weight: normal;
+
         padding: 6px 0;
         text-align: center;
+        font-size: 18px;
     }
 
     .course-price {
@@ -356,7 +370,6 @@
         color: #4a4a4a;
         padding: 5px 23px;
     }
-
     .discount {
         font-size: 26px;
         color: #fa6240;

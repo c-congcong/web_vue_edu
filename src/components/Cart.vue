@@ -4,7 +4,7 @@
         <div class="cart_info">
             <div class="cart_title">
                 <span class="text">我的购物车</span>
-                <span class="total">共4门课程</span>
+                <span class="total">共{{this.$store.state.cart_length}}门课程</span>
             </div>
             <div class="cart_table">
                 <div class="cart_head_row">
@@ -18,9 +18,15 @@
                     <CartItem v-for="(course,index) in cart_list" :key="index" :course="course"></CartItem>
                 </div>
                 <div class="cart_footer_row">
-                    <span class="cart_select"><label> <el-checkbox
-                    ></el-checkbox><span>全选</span></label></span>
-                    <span class="cart_delete"><i class="el-icon-delete"></i> <span>删除</span></span>
+                    <span class="cart_select">
+                        <label>
+                            <el-checkbox v-model="selected"></el-checkbox>&nbsp&nbsp&nbsp&nbsp&nbsp
+                            <span>全选</span>
+                        </label>
+                    </span>
+                    <span class="cart_delete"><i class="el-icon-delete"></i>
+                        <span @click="del_all">删除</span>
+                    </span>
                     <span class="goto_pay">去结算</span>
                     <span class="cart_total">总计：¥0.0</span>
                 </div>
@@ -39,15 +45,121 @@
 
     export default {
         name: "cart",
-        data(){
-            return{
-                cart_list:[]
+        watch: {
+            'selected': function () {
+                //切换状态
+                this.change_all()
+            },
+        },
+        data() {
+            return {
+                cart_list: [],
+                selected: false,
+                id: '',
             }
         },
         created() {
             this.get_cart();
         },
         methods: {
+            //全部删除
+            del_all() {
+                for (let m in this.cart_list) {
+                    this.selected = this.cart_list[m].selected;
+                    this.id = this.cart_list[m].id;
+                    if (this.selected) {
+                        let token = localStorage.user_token || sessionStorage.user_token;
+                        this.$axios.delete(`${this.$settings.HOST}cart/option/${this.id}`, {
+                            headers: {
+                                "Authorization": "jwt " + token,
+                            }
+                        }).then(response => {
+                            this.$message.success(response.data.message);
+                            let i = 10;
+                            setInterval(() => {
+                                if (i <= 1) {
+                                    //刷新界面
+                                    location.reload();
+                                } else {
+                                    i--;
+                                }
+                            }, 100);
+                        }).catch(error => {
+                            console.log(error.response);
+                        });
+                    }
+                }
+            },
+            //全选反选
+            change_all() {
+                //获取复选框状态，如果复选框是选中状态，则不操作，否则改变选中状态为true
+                //如果全部选中再次点击则变为全不选
+                //遍历cart_list得到每条商品的选中状态
+                //定义一个累加器
+                let num = 0;
+                for (let i in this.cart_list) {
+                    this.selected = this.cart_list[i].selected;
+                    this.id = this.cart_list[i].id;
+                    if (this.selected) {
+                        //不变 累加器 判断累加器最后跟cart_list的length是否相等 ，如果相等则全部都是选中的
+                        num++;
+                    } else {
+                        //改变选中状态
+                        let token = localStorage.user_token || sessionStorage.user_token;
+                        this.$axios.patch(`${this.$settings.HOST}cart/option/change_all/`, {
+                            selected: this.selected,
+                            course_id: this.id,
+                        }, {
+                            headers: {
+                                "Authorization": "jwt " + token,
+                            }
+                        }).then(response => {
+                            this.$message.success(response.data.message);
+                            let j = 10;
+                            setInterval(() => {
+                                if (j <= 1) {
+                                    //刷新界面
+                                    location.reload();
+                                } else {
+                                    j--;
+                                }
+                            }, 100);
+                        }).catch(error => {
+                            console.log(error.response);
+                        })
+                    }
+                }
+                if (num === this.cart_list.length) {
+                    for (let n in this.cart_list) {
+                        this.selected = this.cart_list[n].selected;
+                        this.id = this.cart_list[n].id;
+                        //改变选中状态
+                        let token = localStorage.user_token || sessionStorage.user_token;
+                        this.$axios.patch(`${this.$settings.HOST}cart/option/change_all/`, {
+                            selected: this.selected,
+                            course_id: this.id,
+                        }, {
+                            headers: {
+                                "Authorization": "jwt " + token,
+                            }
+                        }).then(response => {
+                            this.$message.success(response.data.message);
+                            let j = 10;
+                            setInterval(() => {
+                                if (j <= 1) {
+                                    //刷新界面
+                                    location.reload();
+                                } else {
+                                    j--;
+                                }
+                            }, 100);
+                        }).catch(error => {
+                            console.log(error.response);
+                        })
+                    }
+                }
+            },
+
             //墙灯
             user_login() {
                 let token = localStorage.user_token || sessionStorage.user_token;
@@ -65,23 +177,23 @@
 
             get_cart() {
                 let token = this.user_login();
-                this.$axios.get(`${this.$settings.HOST}cart/option/`,{
-                    headers:{
+                this.$axios.get(`${this.$settings.HOST}cart/option/`, {
+                    headers: {
                         "Authorization": "jwt " + token,
                     }
                 }).then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     this.cart_list = response.data;
-                    this.$store.commit("add_cart",this.cart_list.length);
+                    this.$store.commit("add_cart", this.cart_list.length);
                 }).catch(error => {
                     console.log(error.response);
                 })
             }
         },
         components: {
-            CartItem:CartItem,
-            Header:Header,
-            Footer:Footer,
+            CartItem: CartItem,
+            Header: Header,
+            Footer: Footer,
         }
 
     }

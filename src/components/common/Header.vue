@@ -6,7 +6,16 @@
                     <router-link to="/"><img src="/static/image/logo.png" alt=""></router-link>
                 </div>
                 <ul class="nav full-left">
-                    <li v-for="i in Header_list"><span v-if="i.position === 1"><router-link to="/python">{{i.title}}</router-link></span></li>
+                    <li v-for="i in Header_list">
+                        <span v-if="i.position === 1">
+                            <span v-if="i.is_site">
+                                <a :href="i.link">{{i.title}}</a>
+                            </span>
+                            <span v-else>
+                                <router-link to="/python">{{i.title}}</router-link>
+                            </span>
+                        </span>
+                    </li>
                 </ul>
                 <!--          用户存在      -->
                 <div class="login-bar full-right" v-if="token">
@@ -69,7 +78,7 @@
                     method: "get",
                 }).then(res => {
                     // 当前请求的返回值可以通过res接受到
-                    // console.log(res.data);
+                    // console.log(res.data,11);
                     this.Header_list = res.data;
                 }).catch(error => {
                     console.log(error);
@@ -81,7 +90,7 @@
             // 获取顶部数据
             this.get_head();
             this.get_token();
-            let username = localStorage.user_name || sessionStorage.user_name;
+            let username = localStorage.username || sessionStorage.username;
             if (username) {
                 this.name = username
             }
@@ -116,7 +125,7 @@
     .header .content .logo {
         height: 80px;
         line-height: 80px;
-        margin-right: 50px;
+        margin-right: 0px;
         cursor: pointer; /* 设置光标的形状为爪子 */
     }
 
