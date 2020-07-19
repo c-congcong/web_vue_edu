@@ -34,7 +34,9 @@
                     </p>
                     <div class="buy">
                         <div class="buy-btn">
-                            <button class="buy-now">立即购买</button>
+                            <router-link to="/order">
+                                <button class="buy-now" @click="add_cart">立即购买</button>
+                            </router-link>
                             <button class="free">免费试学</button>
                         </div>
                         <div class="add-cart" @click="add_cart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车
@@ -70,7 +72,10 @@
                                     <p class="name"><span class="index">{{i.chapter}}-{{index+1}}</span>{{j.name}}
                                         <span class="free" v-if="j.free_trail">免费</span>
                                     </p>
-                                    <p class="time">{{j.duration}}</p>
+                                    <p class="time">
+                                        <img src="/static/image/sp.png" alt="">
+                                        {{j.duration}}
+                                    </p>
                                     <button class="try">立即试学</button>
                                 </li>
                             </ul>
@@ -189,9 +194,6 @@
 
             },
 
-            //展示购物车
-
-
             // 获取所有课程的信息
             get_course_list() {
                 let id = this.$route.params.id;
@@ -209,6 +211,7 @@
                     console.log(error.response);
                 })
             },
+
             get_chapter_list() {
                 this.$axios.get(`${this.$settings.HOST}course/chapter/`, {
                     params: {
@@ -221,12 +224,15 @@
                     console.log(error);
                 })
             },
+
             onPlayerPlay(event) {
 
             },
+
             onPlayerPause(event) {
 
             },
+
             add() {
                 let msg = this.msg;
                 if (msg) {
@@ -235,6 +241,7 @@
                     this.msg = '';
                 }
             },
+
             //倒计时
             time_sub() {
                 setInterval(() => {
@@ -370,6 +377,7 @@
         color: #4a4a4a;
         padding: 5px 23px;
     }
+
     .discount {
         font-size: 26px;
         color: #fa6240;

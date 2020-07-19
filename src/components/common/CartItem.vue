@@ -15,7 +15,7 @@
             </el-select>
         </div>
         <div class="cart_column column_4">{{course.real_price}}</div>
-        <div class="cart_column column_4" @click="del">删除</div>
+        <div class="cart_column column_4" @click="del" @delete_cart="del">删除</div>
     </div>
 </template>
 
@@ -40,50 +40,23 @@
             //删除当前商品
             del() {
                 let token = localStorage.user_token || sessionStorage.user_token;
-                // this.$axios({
-                //     url: this.$settings.HOST + `cart/option/`,
-                //     method: "delete",
-                //     data: {
-                //         course_id: this.course.id,
-                //     },
-                //     config: {
-                //         headers: {
-                //             //提交token必须在请求头声明token ，jwt必须有空格
-                //             "Authorization": "jwt " + token,
-                //         }
-                //     }
-                //
-                // }).then(response => {
-                //     this.$message.success(response.data.message);
-                //     let i = 10;
-                //     setInterval(() => {
-                //         if (i <= 1) {
-                //             //刷新界面
-                //             location.reload();
-                //         } else {
-                //             i--;
-                //         }
-                //     }, 100);
-                // }).catch(error => {
-                //     console.log(error.response);
-                // });
-
-
                 this.$axios.delete(`${this.$settings.HOST}cart/option/${this.course.id}`, {
                     headers: {
                         "Authorization": "jwt " + token,
                     }
                 }).then(response => {
                     this.$message.success(response.data.message);
-                    let i = 10;
-                    setInterval(() => {
-                        if (i <= 1) {
-                            //刷新界面
-                            location.reload();
-                        } else {
-                            i--;
-                        }
-                    }, 100);
+                    //子组件删除商品时，需要调用父组件的方法重新执行可以向父组件提交事件
+                    this.$emit("delete_course");
+                    // let i = 10;
+                    // setInterval(() => {
+                    //     if (i <= 1) {
+                    //         //刷新界面
+                    //         location.reload();
+                    //     } else {
+                    //         i--;
+                    //     }
+                    // }, 100);
                 }).catch(error => {
                     console.log(error.response);
                 });
@@ -101,6 +74,9 @@
                     }
                 }).then(response => {
                     this.$message.success(response.data.message);
+
+                    this.$emit("change_select");
+
                 }).catch(error => {
                     console.log(error.response);
                 })
@@ -120,8 +96,9 @@
 
                     // 更新切换有效期后课程的价格
                     this.course.real_price = response.data.real_price;
+                    this.$emit("change_select");
 
-                    this.$message.success("切换有效期成功");
+                    // this.$message.success("切换有效期成功");
                 }).catch(error => {
                     console.log(error);
                 })

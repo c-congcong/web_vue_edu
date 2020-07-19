@@ -52,9 +52,10 @@
                         </ul>
                         <div class="pay-box">
                             <span class="discount-type" v-if="course.discount_name">{{course.discount_name}}</span>
-                            <span class="discount-price">￥{{course.real_price}}元</span>
-                            <span class="original-price">原价：{{course.price}}元</span>
-                            <span class="buy-now">立即购买</span>
+                            <span class="discount-price" v-if="course.discount_name">￥{{course.real_price}}元</span>
+                            <span class="original-price" v-if="course.discount_name">原价：{{course.price}}元</span>
+                            <span class="discount-price" v-else>{{course.price}}元</span>
+                            <router-link class="buy-now" :to="'/course/detail/'+course.id">立即购买</router-link>
                         </div>
                     </div>
                 </div>
@@ -89,6 +90,7 @@
                 category_list: [],  // 分类列表
                 course_list: [],     //  课程列表
                 category: 0,
+                course_id: 0,
                 total: 0,   //  课程总数量
                 // course_category: "",    // 分类id
                 // 对数据进行过滤
@@ -109,6 +111,27 @@
             },
         },
         methods: {
+            //购买当前商品加入购物车
+            // add_cart() {
+            //     let id1 = this.$route.params.id;
+            //     this.course_id = id1;
+            //     let token = this.user_login();
+            //     this.$axios.post(`${this.$settings.HOST}cart/option/`, {
+            //         course_id: this.course_id,
+            //     }, {
+            //         headers: {
+            //             "Authorization": "jwt " + token,
+            //         }
+            //     }).then(response => {
+            //         this.$message.success(response.data.message);
+            //         //向状态机提交动作
+            //         this.$store.commit("add_cart", response.data.cart_length)
+            //     }).catch(error => {
+            //         console.log(error.response);
+            //     })
+            //
+            // },
+
             // 获取所有课程的信息
             get_course_list() {
                 // 如果根据过滤条件进行分页  则需要重新指定分页的值

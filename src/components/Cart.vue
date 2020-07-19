@@ -15,7 +15,8 @@
                     <span class="do_more">操作</span>
                 </div>
                 <div class="cart_course_list">
-                    <CartItem v-for="(course,index) in cart_list" :key="index" :course="course"></CartItem>
+                    <CartItem v-for="(course,index) in cart_list" :key="index" :course="course"
+                              @delete_course="del_cart(index)" @change_select="price_all"></CartItem>
                 </div>
                 <div class="cart_footer_row">
                     <span class="cart_select">
@@ -27,8 +28,8 @@
                     <span class="cart_delete"><i class="el-icon-delete"></i>
                         <span @click="del_all">删除</span>
                     </span>
-                    <span class="goto_pay">去结算</span>
-                    <span class="cart_total">总计：¥0.0</span>
+                    <router-link to="/order" class="goto_pay">去结算</router-link>
+                    <span class="cart_total">总计：¥{{total_price | numFilter}}</span>
                 </div>
             </div>
         </div>
@@ -41,6 +42,7 @@
     import CartItem from "./common/CartItem";
     import Header from "./common/Header";
     import Footer from "./common/Footer";
+
 
 
     export default {
@@ -56,12 +58,38 @@
                 cart_list: [],
                 selected: false,
                 id: '',
+                total_price: 0.00,
+                total_prices: 0,
+            }
+        },
+        filters: {
+            numFilter(value) {
+                let realVal = '';
+                if (!isNaN(value) && value !== '') {
+                    // 截取当前数据到小数点后两位
+                    realVal = parseFloat(value).toFixed(2)
+                } else {
+                    realVal = '--'
+                }
+                return realVal
             }
         },
         created() {
             this.get_cart();
         },
         methods: {
+            //商品总价格
+            price_all() {
+                let total = 0;
+                this.cart_list.forEach((course, key) => {
+                    //判断是否中
+                    if (course.selected) {
+                        total += parseFloat(course.real_price);
+                    }
+                    this.total_price = total;
+                })
+            },
+
             //全部删除
             del_all() {
                 for (let m in this.cart_list) {
@@ -75,21 +103,15 @@
                             }
                         }).then(response => {
                             this.$message.success(response.data.message);
-                            let i = 10;
-                            setInterval(() => {
-                                if (i <= 1) {
-                                    //刷新界面
-                                    location.reload();
-                                } else {
-                                    i--;
-                                }
-                            }, 100);
+                            //刷新界面
+                            location.reload();
                         }).catch(error => {
                             console.log(error.response);
                         });
                     }
                 }
             },
+
             //全选反选
             change_all() {
                 //获取复选框状态，如果复选框是选中状态，则不操作，否则改变选中状态为true
@@ -114,7 +136,7 @@
                                 "Authorization": "jwt " + token,
                             }
                         }).then(response => {
-                            this.$message.success(response.data.message);
+                            // this.$message.success(response.data.message);
                             let j = 10;
                             setInterval(() => {
                                 if (j <= 1) {
@@ -175,6 +197,7 @@
                 return token;
             },
 
+            //获取购物车
             get_cart() {
                 let token = this.user_login();
                 this.$axios.get(`${this.$settings.HOST}cart/option/`, {
@@ -185,9 +208,19 @@
                     // console.log(response.data);
                     this.cart_list = response.data;
                     this.$store.commit("add_cart", this.cart_list.length);
+                    //计算总价
+                    this.price_all();
+
                 }).catch(error => {
                     console.log(error.response);
                 })
+            },
+            del_cart(key) {
+                //从购物车删除指定商品
+                this.cart_list.splice(key, 1);
+                this.$store.commit("add_cart", this.cart_list.length);
+
+                this.price_all();
             }
         },
         components: {

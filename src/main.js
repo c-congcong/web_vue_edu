@@ -6,6 +6,9 @@ import router from './router'
 import store from './store/index'
 
 
+// import {Emit} from "./emit/emit";
+// Vue.prototype.Emit = Emit;
+
 // axios配置
 import axios from "axios";
 

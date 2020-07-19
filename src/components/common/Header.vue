@@ -20,8 +20,11 @@
                 <!--          用户存在      -->
                 <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
-                        <img src="/static/image/" alt="">
+                        <img src="/static/image/gwc.png" alt="">
                         <span><router-link to="/cart">{{this.$store.state.cart_length}}购物车</router-link></span>
+                    </div>
+                    <div class="shop-cart full-left">
+                        <span><router-link to="/cart">{{this.$store.state.order_length}}我的订单</router-link></span>
                     </div>
                     <div class="login-box full-left">
                         <router-link to="/home/login/" v-model="name">欢迎{{name}}</router-link>
@@ -58,6 +61,22 @@
             }
         },
         methods: {
+            //获取购物车长度
+            get_length() {
+                let token = localStorage.user_token || sessionStorage.user_token;
+                this.$axios.get(`${this.$settings.HOST}cart/option/`, {
+                    headers: {
+                        "Authorization": "jwt " + token,
+                    }
+                }).then(response => {
+                    this.cart_list = response.data;
+                    this.$store.commit("add_cart", this.cart_list.length);
+
+                }).catch(error => {
+                    console.log(error.response);
+                })
+            },
+
             //退出登录
             quit(){
                 //清空localstorage
@@ -90,6 +109,7 @@
             // 获取顶部数据
             this.get_head();
             this.get_token();
+            this.get_length();
             let username = localStorage.username || sessionStorage.username;
             if (username) {
                 this.name = username
@@ -117,7 +137,7 @@
     }
 
     .header .content {
-        max-width: 1200px;
+        max-width: 1300px;
         width: 100%;
         margin: 0 auto;
     }
