@@ -14,7 +14,7 @@ export default new Vuex.Store({
             state.cart_length = data;
         },
         add_order(state,data){
-            state.cart_length = data;
+            state.order_length = data;
         },
 
     }

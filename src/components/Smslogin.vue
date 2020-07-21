@@ -12,25 +12,16 @@
                     <span>短信登录</span>
                 </div>
                 <div class="inp" v-if="">
-                    <input type="text" placeholder="用户名 / 手机号码" class="user" v-model="username">
+                    <input type="text" placeholder="手机号码" class="user" v-model="mobile">
                     <div class="sms-box">
                         <input v-model="code" type="text" maxlength="6" placeholder="输入验证码" class="user">
                         <div class="sms-btn" @click="get_code">{{sms_text}}</div>
                     </div>
                     <div id="geetest1"></div>
-                    <button class="login_btn btn btn-primary" @click="get_captcha">登录</button>
+                    <button class="login_btn btn btn-primary" @click="sms_login">登录</button>
                     <p class="go_login">没有账号
                         <router-link to="/home/register">立即注册</router-link>
                     </p>
-                </div>
-                <div class="inp" v-show="">
-                    <input type="text" placeholder="手机号码" class="user">
-                    <input type="text" class="pwd" placeholder="短信验证码">
-                    <button id="get_code" class="btn btn-primary">获取验证码</button>
-                    <button class="login_btn">登录</button>
-                    <span class="go_login">没有账号
-                    <router-link to="/home/register">立即注册</router-link>
-                </span>
                 </div>
             </div>
         </div>
@@ -44,8 +35,81 @@
             return {
                 sms_text: "请输入验证码", // 提示语
                 sms_flag: false,    // 能否再次发送短信
+                mobile: '',
+                code:'',
             }
-        }
+        },
+        methods: {
+            // 用户登录的方法
+            sms_login() {
+                this.$axios({
+                    url: this.$settings.HOST + "user/sms_login/",
+                    method: "post",
+                    data: {
+                        mobile: this.mobile,
+                        sms_code: this.code,
+                    }
+                }).then(response => {
+                    console.log(response.data);
+                    this.$message({
+                        message: '恭喜你，登录成功',
+                        type: 'success'
+                    });
+                    // 保存用户信息完成注册后 自动登录
+                    sessionStorage.user_id = response.data.id;
+                    sessionStorage.username = response.data.username;
+                    sessionStorage.user_token = response.data.token;
+                    // 登录成功后返回首页
+                    this.$router.push("/");
+                }).catch(error => {
+                    this.$message.error("手机号或验证码错误");
+                })
+            },
+            // // 检测手机号是否唯一
+            // checkMobile() {
+            //     this.$axios({
+            //         url: this.$settings.HOST + "user/mobile/" + `${this.mobile}`,
+            //         method: "get",
+            //     }).catch(error => {
+            //         this.$message.error(error.response.data)
+            //     })
+            // },
+            // 为手机号获取验证码
+            get_code() {
+
+                // 验证手机号格式
+                if (!/1[35689]\d{9}/.test(this.mobile)) {
+                    this.$alert("手机号格式有误", "警告");
+                    return false
+                }
+
+                this.$axios({
+                    url: this.$settings.HOST + "user/sms/" + `${this.mobile}`,
+                    method: "get",
+                }).then(response => {
+                    console.log(response.data);
+
+                    // 成功则可以再次发送短信
+                    this.sms_flag = true;
+                    let interval = 60;
+                    let timer = setInterval(() => {
+                        if (interval <= 1) {
+                            // 停止倒计时  允许发送短信
+                            clearInterval(timer);
+                            this.sms_flag = false; // 设置允许发送短信 false
+                            this.sms_text = `点击发送短信`
+                        } else {
+                            interval--;
+                            this.sms_text = `${interval}后可以点击发送`;
+                        }
+                    }, 1000)
+
+                }).catch(error => {
+                    console.log(error.response);
+                    this.$message.error("当前手机号已经发送过短信")
+                })
+            },
+        },
     }
 </script>
 

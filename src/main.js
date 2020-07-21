@@ -6,8 +6,11 @@ import router from './router'
 import store from './store/index'
 
 
-// import {Emit} from "./emit/emit";
-// Vue.prototype.Emit = Emit;
+// 格式化时间
+import moment from 'moment'
+
+Vue.prototype.$moment = moment;
+
 
 // axios配置
 import axios from "axios";

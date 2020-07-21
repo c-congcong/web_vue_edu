@@ -24,7 +24,7 @@
                         <span><router-link to="/cart">{{this.$store.state.cart_length}}购物车</router-link></span>
                     </div>
                     <div class="shop-cart full-left">
-                        <span><router-link to="/cart">{{this.$store.state.order_length}}我的订单</router-link></span>
+                        <span><router-link to="/get_order">{{this.$store.state.order_length}}我的订单</router-link></span>
                     </div>
                     <div class="login-box full-left">
                         <router-link to="/home/login/" v-model="name">欢迎{{name}}</router-link>
@@ -61,6 +61,22 @@
             }
         },
         methods: {
+            //
+            get_order_details() {
+                let token = localStorage.user_token || sessionStorage.user_token;
+                this.$axios.get(`${this.$settings.HOST}order/git_option/`, {
+                    headers: {
+                        "Authorization": "jwt " + token,
+                    }
+                }).then(response => {
+                    // console.log(response.data);
+                    this.order_list = response.data;
+                    this.$store.commit("add_order", response.data.length)
+                }).catch(error => {
+                    console.log(error.response);
+                })
+            },
+
             //获取购物车长度
             get_length() {
                 let token = localStorage.user_token || sessionStorage.user_token;
@@ -110,6 +126,7 @@
             this.get_head();
             this.get_token();
             this.get_length();
+            this.get_order_details();
             let username = localStorage.username || sessionStorage.username;
             if (username) {
                 this.name = username
@@ -137,7 +154,7 @@
     }
 
     .header .content {
-        max-width: 1300px;
+        max-width: 1350px;
         width: 100%;
         margin: 0 auto;
     }

@@ -8,11 +8,14 @@ import Course from "../components/Course";
 import CourseDetail from "../components/CourseDetail";
 import Cart from "../components/Cart";
 import Order from "../components/Order";
+import OrderSuccess from "../components/OrderSuccess";
+import OrderDetails from "../components/OrderDetails";
 
 
 Vue.use(Router);
 
 export default new Router({
+    mode: 'history',
     routes: [
         {
             path: '/',
@@ -31,38 +34,48 @@ export default new Router({
         },
         {
             path: '/home/register',
-            name:"register",
+            name: "register",
             component: Register
         },
         {
             path: '/home/sms',
-            name:"sms",
+            name: "sms",
             component: Smslogin
         },
         {
             path: '/python',
-            name:"Course",
+            name: "Course",
             component: Course
         },
         {
             path: '/course/detail',
-            name:"Detail",
+            name: "Detail",
             component: CourseDetail
         },
         {
             path: '/course/detail/:id',
-            name:"Detail",
+            name: "Detail",
             component: CourseDetail
         },
         {
             path: '/cart',
-            name:"Cart",
+            name: "Cart",
             component: Cart
         },
         {
             path: '/order',
-            name:"Order",
+            name: "Order",
             component: Order
+        },
+        {
+            path: '/pay',
+            name: "OrderSuccess",
+            component: OrderSuccess
+        },
+        {
+            path: '/get_order',
+            name: "OrderDetails",
+            component: OrderDetails
         },
     ]
 })

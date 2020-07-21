@@ -27,14 +27,6 @@
                         <router-link to="/home/register">立即注册</router-link>
                     </p>
                 </div>
-                <div class="inp" v-show="">
-                    <input type="text" placeholder="手机号码" class="user">
-                    <input type="text" class="pwd" placeholder="短信验证码">
-                    <button id="get_code" class="btn btn-primary">获取验证码</button>
-                    <button class="login_btn">登录</button>
-                    <span class="go_login">没有账号
-                    <router-link to="/home/register">立即注册</router-link>
-                </span>
                 </div>
             </div>
         </div>

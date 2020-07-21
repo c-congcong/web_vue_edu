@@ -2,49 +2,41 @@
     <div class="cart">
         <Header></Header>
         <div class="cart-info">
-            <h3 class="cart-top">订单详情 <span>共{{order_list.length}}门课程</span></h3>
+            <h3 class="cart-top">购物车结算 <span>共{{order_list.length}}份订单</span></h3>
             <div class="cart-title">
                 <el-row>
-                    <el-col :span="6">课程</el-col>
-                    <el-col :span="6">活动类型</el-col>
-                    <el-col :span="6">有效期</el-col>
-                    <el-col :span="6">价格</el-col>
+                    <el-col :span="4">订单标题</el-col>
+                    <el-col :span="5">订单号</el-col>
+                    <el-col :span="3">实付价格</el-col>
+                    <el-col :span="3">订单总价</el-col>
+                    <el-col :span="3">订单状态</el-col>
+                    <el-col :span="3">支付方式</el-col>
+                    <el-col :span="3">操作</el-col>
                 </el-row>
             </div>
             <div class="cart-item">
                 <el-row v-for="(i,index) in order_list" :key="index">
-                    <el-col :span="6" class="course-info">
-                        <img :src="i.course_img" style="width: 120px; height: 80px" alt="">
-                        <span>{{i.name}}</span>
+                    <el-col :span="4" class="course-info">
+                        <span >{{i.order_title}}</span>
                     </el-col>
-                    <el-col :span="6">
-                        <span style="color: red; " v-if="i.discount_name">{{i.discount_name}}</span>
-                        <span style="color: red; " v-else>暂无活动</span>
-                    </el-col>
-                    <el-col :span="6"><span>{{i.expire_text}}</span></el-col>
-                    <el-col :span="6">
+                    <el-col :span="5" class="course-info"><span>{{i.order_number}}</span></el-col>
+                    <el-col :span="3">
                         <span class="discount-price">￥{{i.real_price}}元</span>
-                        <span class="original-price">原价：{{i.price}}元</span>
                     </el-col>
-                </el-row>
-            </div>
-            <div class="calc">
-                <el-row class="pay-row">
-                    <el-col :span="4" class="pay-col"><span class="pay-text">支付方式：</span></el-col>
-                    <el-col :span="8">
-                        <span class="alipay" @click="zfb">
-                            <img src="../../static/image/alipay2.png" alt="" v-if="pay_type == 1">
-                            <img src="../../static/image/alipay.png" alt="" v-else>
-                        </span>
-                        <span class="alipay wechat" @click="zfb">
-                            <img src="../../static/image/wechat.png" alt="" v-if="pay_type == 1">
-                            <img src="../../static/image/wechat2.png" alt="" v-else>
-                        </span>
+                    <el-col :span="3">
+                        <span class="original-price">总价：{{i.total_price}}元</span>
                     </el-col>
-                    <el-col :span="8" class="count">实付款： <span>¥{{total_price|numFilter}}</span></el-col>
-                    <el-col :span="4" class="cart-pay">
-                        <span @click="generate_order">{{pay_name}}</span>
+                    <el-col :span="3" class="course-info">
+                        <span v-if="i.order_status===0">未支付</span>
+                        <span v-else-if="i.order_status===1">已支付</span>
+                        <span v-else-if="i.order_status===2">已取消</span>
+                        <span v-else>超时取消</span>
                     </el-col>
+                    <el-col :span="3" class="course-info">
+                        <span v-if="i.pay_type===1">支付宝</span>
+                        <span v-else>微信支付</span>
+                    </el-col>
+                    <el-col :span="3"><span>删除</span></el-col>
                 </el-row>
             </div>
         </div>
@@ -53,20 +45,17 @@
 </template>
 
 <script>
-
+    // import CartItem from "./common/CartItem";
     import Header from "./common/Header";
     import Footer from "./common/Footer";
 
     export default {
-        name: "Order",
+        name: "OrderDetails",
         data() {
             return {
                 order_list: [],
-                order: [],
-                total_price: 0,
-                pay_type: '1',
-                pay_name: '支付宝支付',
-                order_number: '',
+                // details_list: [],
+                // id_list: [],
             }
         },
         filters: {
@@ -82,100 +71,37 @@
             }
         },
         created() {
-            this.get_select_course();
-        },
-        components: {
-            Header: Header,
-            Footer: Footer,
+            this.get_order_details();
+            // this.get_course_name();
+            // this.get_details();
         },
         methods: {
-            zfb() {
-                if (this.pay_type === "1") {
-                    this.pay_type = "2";
-                    this.pay_name = "微信支付"
-                } else {
-                    this.pay_type = "1";
-                    this.pay_name = "支付宝支付"
-                }
-            },
 
-            //向支付宝生成发起获取生成支付链接的url
-            // get_url() {
-            //     let token = localStorage.user_token || sessionStorage.user_token;
-            //     this.$axios.get(`${this.$settings.HOST}payments/pay/`, {
-            //         params: {
-            //             order_number: this.order_number
-            //         },
-            //         headers: {
-            //             "Authorization": "jwt " + token,
-            //         }
-            //     }).then(response => {
-            //         console.log(response.data);
-            //         //返回支付连接，跳转
-            //         location.href = response.data;
-            //     }).catch(error => {
-            //         console.log(error.response);
-            //     })
-            // },
-
-            //获取选中商品信息
-            get_select_course() {
+            get_order_details() {
                 let token = localStorage.user_token || sessionStorage.user_token;
-                this.$axios.get(`${this.$settings.HOST}cart/order/`, {
+                this.$axios.get(`${this.$settings.HOST}order/get_option/`, {
                     headers: {
                         "Authorization": "jwt " + token,
                     }
                 }).then(response => {
-                    console.log(response.data);
-                    this.order_list = response.data.course_list;
-                    this.total_price = response.data.total_price;
+                    this.order_list = response.data;
+                    this.$store.commit("add_order", response.data.length)
                 }).catch(error => {
                     console.log(error.response);
                 })
             },
-            //生成订单
-            generate_order() {
-                let token = localStorage.user_token || sessionStorage.user_token;
-                this.$axios.post(`${this.$settings.HOST}order/option/`, {
-                    pay_type: this.pay_type,
-                }, {
-                    headers: {
-                        "Authorization": "jwt " + token,
-                    }
-                }).then(response => {
-                    this.order = response.data;
-                    this.$message.success("订单生成成功！");
-                    this.$store.commit("add_order", this.order_list.length);
-                    this.order_number = response.data.order_number;
-                    console.log(this.order_number);
-                    //跳转支付页面
-                    // this.get_url();
-                    this.$axios.get(`${this.$settings.HOST}payments/pay/`, {
-                        params: {
-                            order_number: this.order_number
-                        },
-                        headers: {
-                            "Authorization": "jwt " + token,
-                        }
-                    }).then(response => {
-                        console.log(response.data);
-                        //返回支付连接，跳转
-                        location.href = response.data;
-                    }).catch(error => {
-                        console.log(error.response);
-                    })
-
-                }).catch(error => {
-                    console.log(error.response);
-                })
-            },
+        },
+        components: {
+            // CartItem: CartItem,
+            Header: Header,
+            Footer: Footer,
         }
     }
 </script>
 
 <style scoped>
     .discount-price {
-        font-size: 18px;
+        font-size: 14px;
         color: #fa6240;
         float: left;
         margin-left: 18px;
@@ -494,5 +420,4 @@
     .is_selected {
         transform: rotate(-1turn) !important;
     }
-
 </style>
