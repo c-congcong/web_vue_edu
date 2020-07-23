@@ -39,7 +39,7 @@
                             </router-link>
                             <button class="free">免费试学</button>
                         </div>
-                        <div class="add-cart" @click="add_cart"><img src="/static/image/cart-yellow.svg" alt="">加入购物车
+                        <div class="add-cart" @click="add_cart"><img src="/static/image/gw.jpg" alt="">加入购物车
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                                         <span class="free" v-if="j.free_trail">免费</span>
                                     </p>
                                     <p class="time">
-                                        <img src="/static/image/sp.png" alt="">
+                                        <img src="/static/image/sp1.png" alt="">
                                         {{j.duration}}
                                     </p>
                                     <button class="try">立即试学</button>
@@ -87,7 +87,7 @@
                                 <h2>评论区</h2><br>
                                 <el-input style="width: 650px" v-model="msg" placeholder="请输入内容"></el-input>
                                 <el-button style="float: right; padding: 10px 0" size="medium" @click="add" type="text">
-                                    操作按钮
+                                    确认
                                 </el-button>
                             </div>
                             <div v-for="m in msgs" class="text item" style="color: #9b9b9b">

@@ -12,6 +12,7 @@
                     <router-link to="/home/sms">短信登录</router-link>
                 </div>
                 <div class="inp" v-if="">
+                    <input type="text" :placeholder=this.loc_name class="user" v-model="username" v-if="loc_name">
                     <input type="text" placeholder="用户名 / 手机号码" class="user" v-model="username">
                     <input type="password" name="" class="pwd" placeholder="密码" v-model="password">
                     <div id="geetest1"></div>
@@ -27,7 +28,6 @@
                         <router-link to="/home/register">立即注册</router-link>
                     </p>
                 </div>
-                </div>
             </div>
         </div>
     </div>
@@ -40,10 +40,15 @@
             return {
                 username: "",
                 password: "",
-                remember_me: false
+                remember_me: false,
+                loc_name:'',
             }
         },
+        created() {
+            this.loc_name = localStorage.username;
+        },
         methods: {
+
             // 用户登录的方法
             user_login() {
                 this.$axios({
@@ -102,7 +107,7 @@
                     }, this.handlerPopup);
 
                 }).catch(error => {
-                    console.log(error);
+                    // console.log(error);
                     this.$message.error("用户名或密码错误");
                 })
             },

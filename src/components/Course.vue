@@ -98,7 +98,7 @@
                     type: "id", // 筛选类型
                     orders: "desc", // 排序类型  desc降序 asc  升序
                     page: 1, // 分页的页码
-                    size: 2,    // 每页展示的数量
+                    size: 5,    // 每页展示的数量
                 },
             }
         },
@@ -218,7 +218,7 @@
             this.get_all_category();
             this.get_course_list();
             //强登
-            let username = localStorage.getItem("username");
+            let username = localStorage.getItem("username")||sessionStorage.getItem("username");
             if (username) {
                 this.name = username
             } else {

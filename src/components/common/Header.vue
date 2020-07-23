@@ -20,16 +20,20 @@
                 <!--          用户存在      -->
                 <div class="login-bar full-right" v-if="token">
                     <div class="shop-cart full-left">
-                        <img src="/static/image/gwc.png" alt="">
+                        <img src="/static/image/gw.jpg" alt="">
                         <span><router-link to="/cart">{{this.$store.state.cart_length}}购物车</router-link></span>
                     </div>
                     <div class="shop-cart full-left">
-                        <span><router-link to="/get_order">{{this.$store.state.order_length}}我的订单</router-link></span>
+                        <img src="/static/image/dd.jpg" alt="">
+                        <span><router-link to="/order_list">{{this.$store.state.order_length}}我的订单</router-link></span>
                     </div>
-                    <div class="login-box full-left">
+                    <div class="shop-cart full-left">
+                        <img src="/static/image/man.jpg" alt="">
                         <router-link to="/home/login/" v-model="name">欢迎{{name}}</router-link>
-                        &nbsp;|&nbsp;
-                        <span><a href="javascript:;" @click="quit">退出登录</a></span>
+                    </div>
+                    <div class="shop-cart full-left">
+                        <img src="/static/image/bick.jpg" alt="">
+                        <span><a href="javascript:;" @click="quit">退出</a></span>
                     </div>
                 </div>
                 <!--          用户不存在      -->
@@ -154,7 +158,7 @@
     }
 
     .header .content {
-        max-width: 1350px;
+        max-width: 1500px;
         width: 100%;
         margin: 0 auto;
     }
@@ -204,13 +208,13 @@
     }
 
     .header .login-bar .shop-cart {
-        margin-right: 20px;
+        /*margin-right: 20px;*/
         border-radius: 17px;
         background: #f7f7f7;
         cursor: pointer;
         font-size: 14px;
         height: 28px;
-        width: 100px;
+        width: 120px;
         margin-top: 30px;
         line-height: 32px;
         text-align: center;

@@ -12,7 +12,7 @@
                     <span>短信登录</span>
                 </div>
                 <div class="inp" v-if="">
-                    <input type="text" placeholder="手机号码" class="user" v-model="mobile">
+                    <input type="text" @blur="checkMobile" placeholder="手机号码" class="user" v-model="mobile">
                     <div class="sms-box">
                         <input v-model="code" type="text" maxlength="6" placeholder="输入验证码" class="user">
                         <div class="sms-btn" @click="get_code">{{sms_text}}</div>
@@ -56,7 +56,6 @@
                         type: 'success'
                     });
                     // 保存用户信息完成注册后 自动登录
-                    sessionStorage.user_id = response.data.id;
                     sessionStorage.username = response.data.username;
                     sessionStorage.user_token = response.data.token;
                     // 登录成功后返回首页
@@ -65,15 +64,16 @@
                     this.$message.error("手机号或验证码错误");
                 })
             },
-            // // 检测手机号是否唯一
-            // checkMobile() {
-            //     this.$axios({
-            //         url: this.$settings.HOST + "user/mobile/" + `${this.mobile}`,
-            //         method: "get",
-            //     }).catch(error => {
-            //         this.$message.error(error.response.data)
-            //     })
-            // },
+            // 检测手机号是否唯一
+            checkMobile() {
+                this.$axios({
+                    url: this.$settings.HOST + "user/mobile1/" + `${this.mobile}`,
+                    method: "get",
+                }).catch(error => {
+                    this.$message.error(error.response.data)
+                })
+            },
+
             // 为手机号获取验证码
             get_code() {
 
